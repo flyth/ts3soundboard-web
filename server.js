@@ -3,7 +3,20 @@ var
 	dgram = require('dgram'),
 	fs = require('fs');
 
-var BASE_PATH = '/home/bot/music/';
+var config, tmpConfig;
+try {
+	tmpConfig = fs.readFileSync(__dirname + '/config.json');
+} catch (err) {
+	throw new Error('No config.json present.');
+}
+
+try {
+	config = JSON.parse(tmpConfig);
+} catch (err) {
+	throw new Error('Config file does not seem to be valid JSON.');
+}
+
+var BASE_PATH = config.basePath;
 
 var playlist = [];
 var tracks = [];
