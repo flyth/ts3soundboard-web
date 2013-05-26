@@ -81,7 +81,7 @@ fs.readdir(BASE_PATH, function (err, files) {
 		throw new Error('Could not find files in basePath. Aborting.');
 	}
 	files.forEach(function (file) {
-		tracks.push({ file: BASE_PATH + file, name: file });
+		tracks.push({ file: BASE_PATH + '/' + file, name: file });
 	});
 });
 
