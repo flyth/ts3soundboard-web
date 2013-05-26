@@ -1,3 +1,21 @@
 {
-	"basePath": "/home/bot/music"
+	"basePath": "/home/bot/music",
+	"users": {
+		"admin": {
+			"password": "soundboard",
+			"permissions": {
+				"view": true,
+				"play": true,
+				"queue": true,
+				"unqueue": true,
+				"stop": true
+			}
+		},
+		"guest": {
+			"password": "guest",
+			"permissions": {
+				"view": true
+			}
+		}
+	}
 }

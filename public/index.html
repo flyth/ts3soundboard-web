@@ -219,6 +219,8 @@ form {
 <div class="wrapper">
 	<h1>TS3Soundboard</h1>
 	<div style="margin-left: 15px; font-size: 11px;">Currently Playing</div>
+	<a href="#" class="button" id="logout" style="float: right; margin-right: 15px; background-color: #aa4444;">LOGOUT</a>
+	<a href="#" class="button" id="stop" style="float: right; margin-right: 15px; background-color: #aa4444;">STOP</a>
 	<h2 style="margin-left: 15px; margin-top: 0;" id="playing"></h2>
 	<div class="clearfix" style="width: 100%;">
 		<div class="left">
@@ -238,15 +240,69 @@ form {
 </div>
 <script>
 $(document).ready(function () {
-	$(document).on('click', 'li', function () {
+	$(document).on('click', '#logout', function () {
+		$.ajax({
+			type: 'POST',
+			username: 'logout',
+			url: '/',
+			success: function () {
+				window.location.href = '/';
+			},
+			error: function () {
+				window.location.href = '/';	
+			}
+		});
+		return false;		
+	});
+	$(document).on('click', '#stop', function () {
+		$.ajax({
+			type: 'POST',
+			url: '/api/stop',
+			success: function () {
+				refresh();
+			},
+			error: function () {
+				alert('You are not allowed to do that, sorry.');
+			}
+		});
+		return false;		
+	});
+	$(document).on('click', '#tracks li', function () {
 		$.ajax({
 			type: 'POST',
 			url: '/api/play/' + $(this).attr('data-id'),
 			success: function () {
-
+				refresh();
+			},
+			error: function () {
+				alert('You are not allowed to do that, sorry.');
 			}
 		});
-		refresh();
+		return false;
+	});
+	/*
+	$(document).on('dblclick', '#tracks li', function () {
+		$.ajax({
+			type: 'POST',
+			url: '/api/playDirect/' + $(this).attr('data-id'),
+			success: function () {
+				refresh();
+			}
+		});
+		return false;
+	});
+	*/
+	$(document).on('click', '#playlist li', function () {
+		$.ajax({
+			type: 'POST',
+			url: '/api/unqueue/' + $(this).attr('data-id'),
+			success: function () {
+				refresh();
+			},
+			error: function () {
+				alert('You are not allowed to do that, sorry.');
+			}
+		});
 		return false;
 	});
 	$.ajax({
@@ -266,8 +322,8 @@ $(document).ready(function () {
 			dataType: 'json',
 			success: function (data) {
 				$('#playlist').html('');
-				data.forEach(function (track) {
-					$('<li/>').appendTo('#playlist').attr('data-id', track.id).text(track.name);
+				data.forEach(function (track, index) {
+					$('<li/>').appendTo('#playlist').attr('data-id', index).text(track.name);
 				});
 			}
 		});
