@@ -78,6 +78,10 @@ app.get('/api/playlist', function (req, res) {
 
 // Reload track list in case of adding files while running
 app.post('/api/reload', function (req, res) {
+	if (!req.user.permissions.reload) {
+		res.send(403, 'Not allowed.');
+		return;
+	}
 	// /stop will not emit a notification
 	console.log('Stopping');
 	skipNotification = false;
@@ -103,6 +107,10 @@ app.post('/api/reload', function (req, res) {
 
 // Clear playlist, add all tracks, randomize it and then start playing
 app.post('/api/random', function (req, res) {
+	if (!req.user.permissions.queue || !req.user.permissions.unqueue) {
+		res.send(403, 'Not allowed.');
+		return;
+	}
 	// /stop will not emit a notification
 	console.log('Stopping');
 	skipNotification = false;
@@ -128,12 +136,20 @@ app.post('/api/random', function (req, res) {
 
 // Randomize the current playlist
 app.post('/api/randomcurrent', function (req, res) {
+	if (!req.user.permissions.queue) {
+		res.send(403, 'Not allowed.');
+		return;
+	}
 	playlist.sort(function() {return 0.5 - Math.random()});
 	res.end();
 });
 
 // Plays next song in playlist
 app.post('/api/next', function (req, res) {
+	if (!req.user.permissions.play) {
+		res.send(403, 'Not allowed.');
+		return;
+	}
 	if (playlist.length > 0) {
 		// /stop will not emit a notification
 		console.log('Stopping');
@@ -152,6 +168,10 @@ app.post('/api/next', function (req, res) {
 
 // Clear current playlist
 app.post('/api/clear', function (req, res) {
+	if (!req.user.permissions.unqueue) {
+		res.send(403, 'Not allowed.');
+		return;
+	}
 	playlist = [];
 	res.end();
 });
