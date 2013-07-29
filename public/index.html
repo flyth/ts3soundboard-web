@@ -126,7 +126,7 @@ p {
 }
 .wrapper {
 	margin: 20px auto;
-	width: 1000px;
+	width: 90%;
 	background-color: #fafafa;
 	box-shadow: 0 0 16px rgba(0,0,0,0.5);
 	border-top: 8px solid #aaa;
@@ -217,10 +217,15 @@ form {
 }
 </style>
 <div class="wrapper">
-	<h1>TS3Soundboard</h1>
-	<div style="margin-left: 15px; font-size: 11px;">Currently Playing</div>
 	<a href="#" class="button" id="logout" style="float: right; margin-right: 15px; background-color: #aa4444;">LOGOUT</a>
 	<a href="#" class="button" id="stop" style="float: right; margin-right: 15px; background-color: #aa4444;">STOP</a>
+	<a href="#" class="button" id="random" style="float: right; margin-right: 15px; background-color: #aa4444;">RANDOM ALL</a>
+	<a href="#" class="button" id="randomcurrent" style="float: right; margin-right: 15px; background-color: #aa4444;">RANDOM CURRENT</a>
+	<a href="#" class="button" id="clear" style="float: right; margin-right: 15px; background-color: #aa4444;">CLEAR LIST</a>
+	<a href="#" class="button" id="next" style="float: right; margin-right: 15px; background-color: #aa4444;">NEXT SONG</a>
+	<a href="#" class="button" id="reload" style="float: right; margin-right: 15px; background-color: #aa4444;">RELOAD</a>
+	<h1>TS3Soundboard</h1>
+	<div style="margin-left: 15px; font-size: 11px;">Currently Playing</div>
 	<h2 style="margin-left: 15px; margin-top: 0;" id="playing"></h2>
 	<div class="clearfix" style="width: 100%;">
 		<div class="left">
@@ -305,6 +310,72 @@ $(document).ready(function () {
 		});
 		return false;
 	});
+	$(document).on('click', '#reload', function () {
+		$.ajax({
+			type: 'POST',
+			url: '/api/reload',
+			success: function () {
+				refresh();
+			},
+			error: function () {
+				alert('You are not allowed to do that, sorry.');
+			}
+		});
+		return false;
+	});
+	$(document).on('click', '#random', function () {
+		$.ajax({
+			type: 'POST',
+			url: '/api/random',
+			success: function () {
+				refresh();
+			},
+			error: function () {
+				alert('You are not allowed to do that, sorry.');
+			}
+		});
+		return false;
+	});
+	$(document).on('click', '#randomcurrent', function () {
+		$.ajax({
+			type: 'POST',
+			url: '/api/randomcurrent',
+			success: function () {
+				refresh();
+			},
+			error: function () {
+				alert('You are not allowed to do that, sorry.');
+			}
+		});
+		return false;
+	});
+	$(document).on('click', '#clear', function () {
+		$.ajax({
+			type: 'POST',
+			url: '/api/clear',
+			success: function () {
+				refresh();
+			},
+			error: function () {
+				alert('You are not allowed to do that, sorry.');
+			}
+		});
+		return false;
+	});
+	$(document).on('click', '#next', function () {
+		$.ajax({
+			type: 'POST',
+			url: '/api/next',
+			success: function () {
+				refresh();
+			},
+			error: function () {
+				alert('You are not allowed to do that, sorry.');
+			}
+		});
+		return false;
+	});
+	
 	$.ajax({
 		cache: false,
 		url: '/api/tracks',

@@ -2,6 +2,8 @@ var
 	express = require('express'),
 	dgram = require('dgram'),
 	fs = require('fs');
+	
+var util = require('util');
 
 var config, tmpConfig;
 try {
@@ -73,6 +75,87 @@ app.get('/api/playlist', function (req, res) {
 	res.setHeader('Content-Type', 'application/x-json');
 	res.end(JSON.stringify(playlist));
 });
+
+// Reload track list in case of adding files while running
+app.post('/api/reload', function (req, res) {
+	// /stop will not emit a notification
+	console.log('Stopping');
+	skipNotification = false;
+	isPlaying = false;
+	var cmd = new Buffer("/stop");
+	cmdSocket.send(cmd, 0, cmd.length, 19111, '127.0.0.1');
+	
+	currentlyPlaying = -1;
+	playlist = [];
+	tracks = [];
+	
+	fs.readdir(BASE_PATH, function (err, files) {
+		if (err) {
+			throw new Error('Could not find files in basePath. Aborting.');
+		}
+		files.forEach(function (file) {
+			tracks.push({ file: BASE_PATH + '/' + file, name: file });
+		});
+	});
+	
+	res.end();
+});
+
+// Clear playlist, add all tracks, randomize it and then start playing
+app.post('/api/random', function (req, res) {
+	// /stop will not emit a notification
+	console.log('Stopping');
+	skipNotification = false;
+	isPlaying = false;
+	var cmd = new Buffer("/stop");
+	cmdSocket.send(cmd, 0, cmd.length, 19111, '127.0.0.1');
+	
+	var nb = 0;
+	playlist = [];
+	tracks.forEach(function(track) {
+		playlist.push({ id: nb, name: track.name });
+		nb = nb + 1;
+	});
+	playlist.sort(function() {return 0.5 - Math.random()});
+	
+	var track = playlist.shift();
+	playById(track.id);
+	isPlaying = true;
+	currentlyPlaying = track.id;
+	
+	res.end();
+});
+
+// Randomize the current playlist
+app.post('/api/randomcurrent', function (req, res) {
+	playlist.sort(function() {return 0.5 - Math.random()});
+	res.end();
+});
+
+// Plays next song in playlist
+app.post('/api/next', function (req, res) {
+	if (playlist.length > 0) {
+		// /stop will not emit a notification
+		console.log('Stopping');
+		skipNotification = false;
+		isPlaying = false;
+		var cmd = new Buffer("/stop");
+		cmdSocket.send(cmd, 0, cmd.length, 19111, '127.0.0.1');
+		
+		var track = playlist.shift();
+		playById(track.id);
+		isPlaying = true;
+		currentlyPlaying = track.id;
+	}
+	res.end();
+});
+
+// Clear current playlist
+app.post('/api/clear', function (req, res) {
+	playlist = [];
+	res.end();
+});
+
 
 app.post('/api/stop', function (req, res) {
 	if (!req.user.permissions.stop) {
