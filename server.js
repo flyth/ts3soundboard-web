@@ -98,7 +98,8 @@ app.post('/api/reload', function (req, res) {
 			throw new Error('Could not find files in basePath. Aborting.');
 		}
 		files.forEach(function (file) {
-			tracks.push({ file: BASE_PATH + '/' + file, name: file });
+			if(file.indexOf('.mp3', file.length - 4) !== -1 || file.indexOf('.ogg', file.length - 4) !== -1)
+				tracks.push({ file: BASE_PATH + '/' + file, name: file });
 		});
 	});
 	
@@ -254,7 +255,8 @@ fs.readdir(BASE_PATH, function (err, files) {
 		throw new Error('Could not find files in basePath. Aborting.');
 	}
 	files.forEach(function (file) {
-		tracks.push({ file: BASE_PATH + '/' + file, name: file });
+		if(file.indexOf('.mp3', file.length - 4) !== -1 || file.indexOf('.ogg', file.length - 4) !== -1)
+			tracks.push({ file: BASE_PATH + '/' + file, name: file });
 	});
 });
 
@@ -280,3 +282,91 @@ var playById = function (id, direct) {
 		cmdSocket.send(cmd, 0, cmd.length, 19111, '127.0.0.1');
 	}
 };
+
+app.post('/api/savepl/:id', function (req, res) {
+	if (!req.user.permissions.queue) {
+		res.send(403, 'Not allowed.');
+		return;
+	}
+	
+	console.log('Saving playlist: ' + req.params.id);
+	
+	var plid = parseInt(req.params.id);
+	if(plid < 1 || plid > 10) {
+		console.log('Operation incorrecte.');
+		res.send(500, 'Not allowed.');
+		return;
+	}
+	pl = [];
+	if(currentlyPlaying > -1 && currentlyPlaying < tracks.length)
+		pl.push(tracks[currentlyPlaying].name);
+	for(i = 0; i < playlist.length; i++) {
+		pl.push(playlist[i].name);
+	}
+	try { fs.writeFileSync(BASE_PATH + '/_playlist.' + plid, JSON.stringify(pl)); }
+	catch (err) {
+		console.log('Impossible de sauvegarder la playlist.');
+		res.send(500, 'Impossible de sauvegarder la playlist.');
+		return;
+	}
+	
+	res.end();
+});
+
+app.post('/api/loadpl/:id', function (req, res) {
+	if (!req.user.permissions.queue) {
+		res.send(403, 'Not allowed.');
+		return;
+	}
+	
+	console.log('Loading playlist: ' + req.params.id);
+	
+	playlist = [];
+	
+	var plid = parseInt(req.params.id);
+	if(plid < 1 || plid > 10) {
+		console.log('Operation incorrecte.');
+		res.send(500, 'Not allowed.');
+		return;
+	}
+	
+	try { tmp = fs.readFileSync(BASE_PATH + '/_playlist.' + plid); }
+	catch (e) {
+		res.send(500, 'Playlist inconnue.');
+		return;
+	}
+	
+	try { lst = JSON.parse(tmp); }
+	catch (e) {
+		res.send(500, 'Playlist invalide.');
+		return;
+	}
+	
+	lst.forEach(function(item) {
+		for(i = 0; i < tracks.length; i++) {
+			if(item == tracks[i].name) {
+				playlist.push({
+					id: i,
+					name: tracks[i].name
+				});
+				break;
+			}
+		}
+	});
+	
+	if(playlist.length > 0) {
+		// /stop will not emit a notification
+		console.log('Stopping');
+		skipNotification = false;
+		isPlaying = false;
+		var cmd = new Buffer("/stop");
+		cmdSocket.send(cmd, 0, cmd.length, 19111, '127.0.0.1');
+		
+		var track = playlist.shift();
+		playById(track.id);
+		isPlaying = true;
+		currentlyPlaying = track.id;
+	}
+	
+	res.end();
+});
