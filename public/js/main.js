@@ -170,7 +170,7 @@ $(document).ready(function () {
 		dataType: 'json',
 		success: function (data) {
 			data.forEach(function (track) {
-				$('<li/>').appendTo('#tracks').attr('data-id', track.id).text(track.name);
+				$('<li/>').appendTo('#tracks').attr('data-id', track.id).text(nameFromPath(track.name));
 			});
 		}
 	});
@@ -182,7 +182,9 @@ $(document).ready(function () {
 			success: function (data) {
 				$('#playlist').html('');
 				data.forEach(function (track, index) {
-					$('<li/>').appendTo('#playlist').attr('data-id', index).text(track.name);
+					track.name = track.name.split("/"); // Keep clam and fuck windows
+					track.name = track.name[track.name.length-1];
+					$('<li/>').appendTo('#playlist').attr('data-id', index).text(nameFromPath(track.name));
 				});
 			}
 		});
@@ -192,7 +194,7 @@ $(document).ready(function () {
 			dataType: 'json',
 			success: function (data) {
 				if (data) {
-					$('#playing').text(data.name);
+					$('#playing').text(nameFromPath(data.name));
 				} else {
 					$('#playing').text('Nothing');
 				}
@@ -234,4 +236,11 @@ $(document).ready(function () {
 	}
 
 	listFilter("#trackshead", "#tracks")
+
+	//Get the filename from a path
+	nameFromPath = function(name)
+	{
+		name = name.split("/"); // Keep clam and fuck windows
+		return name[name.length-1];
+	}
 });

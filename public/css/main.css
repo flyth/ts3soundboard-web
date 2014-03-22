@@ -121,11 +121,7 @@ p {
 	border-top: 8px solid #aaa;
 }
 .commands {
-	left: 10%;
-	right: 10%;
-	position: fixed;
-	top: 20px;
-	z-index: 20;
+
 }
 
 .trackscont {
