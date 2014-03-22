@@ -26,10 +26,10 @@
 	   <option value="3">Cool</option>
 	   <option value="4">Relax</option>
 	   <option value="5">Divers</option>
-	   <option value="6">M&eacute;tal</option>
+	   <option value="6">Metal</option>
 	   <option value="7">Rap RnB</option>
 	   <option value="8">Electro</option>
-	   <option value="9">Hard et Rock</option>
+	   <option value="9">Rock 'n Roll</option>
 	   <option value="10">Punk</option>
 	</select>
 </div>
@@ -39,7 +39,7 @@
 	<h2 style="margin-left: 15px; margin-top: 0;" id="playing"></h2>
 	<div class="clearfix" style="width: 100%;">
 		<div class="trackscont">
-			<h2>Tracks</h2>
+			<h2 id="trackshead">Tracks</h2>
 			<div>
 				<ul id="tracks" class="tracks">
 				</ul>
@@ -55,213 +55,6 @@
 	</div>
 	<div class="footer">&copy; 2011-2013 Michael Friese. All rights reserved.</div>
 </div>
-<script>
-$(document).ready(function () {
-	$(document).on('click', '#logout', function () {
-		$.ajax({
-			type: 'POST',
-			username: 'logout',
-			url: '/',
-			success: function () {
-				window.location.href = '/';
-			},
-			error: function () {
-				window.location.href = '/';	
-			}
-		});
-		return false;		
-	});
-	$(document).on('click', '#stop', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/stop',
-			success: function () {
-				refresh();
-			},
-			error: function () {
-				alert('You are not allowed to do that, sorry.');
-			}
-		});
-		return false;		
-	});
-	$(document).on('click', '#tracks li', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/play/' + $(this).attr('data-id'),
-			success: function () {
-				refresh();
-			},
-			error: function () {
-				alert('You are not allowed to do that, sorry.');
-			}
-		});
-		return false;
-	});
-	/*
-	$(document).on('dblclick', '#tracks li', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/playDirect/' + $(this).attr('data-id'),
-			success: function () {
-				refresh();
-			}
-		});
-		return false;
-	});
-	*/
-	$(document).on('click', '#playlist li', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/unqueue/' + $(this).attr('data-id'),
-			success: function () {
-				refresh();
-			},
-			error: function () {
-				alert('You are not allowed to do that, sorry.');
-			}
-		});
-		return false;
-	});
-	$(document).on('click', '#savepl', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/savepl/' + $('#lstpl').val(),
-			success: function () {
-				refresh();
-				alert('Playlist savegardee');
-			},
-			error: function (result) {
-				if(result.status == 500)
-					alert('Erreur lors de la sauvegarde.');
-				else
-					alert('You are not allowed to do that, sorry.');
-			}
-		});
-		return false;
-	});
-	$(document).on('click', '#loadpl', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/loadpl/' + $('#lstpl').val(),
-			success: function () {
-				refresh();
-				alert('Playlist chargee');
-			},
-			error: function (result) {
-				if(result.status == 500)
-					alert('Playlist inexistante.');
-				else
-					alert('You are not allowed to do that, sorry.');
-			}
-		});
-		return false;
-	});
-	$(document).on('click', '#reload', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/reload',
-			success: function () {
-				refresh();
-			},
-			error: function () {
-				alert('You are not allowed to do that, sorry.');
-			}
-		});
-		return false;
-	});
-	$(document).on('click', '#random', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/random',
-			success: function () {
-				refresh();
-			},
-			error: function () {
-				alert('You are not allowed to do that, sorry.');
-			}
-		});
-		return false;
-	});
-	$(document).on('click', '#randomcurrent', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/randomcurrent',
-			success: function () {
-				refresh();
-			},
-			error: function () {
-				alert('You are not allowed to do that, sorry.');
-			}
-		});
-		return false;
-	});
-	$(document).on('click', '#clear', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/clear',
-			success: function () {
-				refresh();
-			},
-			error: function () {
-				alert('You are not allowed to do that, sorry.');
-			}
-		});
-		return false;
-	});
-	$(document).on('click', '#next', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/next',
-			success: function () {
-				refresh();
-			},
-			error: function () {
-				alert('You are not allowed to do that, sorry.');
-			}
-		});
-		return false;
-	});
-	
-	$.ajax({
-		cache: false,
-		url: '/api/tracks',
-		dataType: 'json',
-		success: function (data) {
-			data.forEach(function (track) {
-				$('<li/>').appendTo('#tracks').attr('data-id', track.id).text(track.name);
-			});
-		}
-	});
-	var refresh = function () {
-		$.ajax({
-			cache: false,
-			url: '/api/playlist',
-			dataType: 'json',
-			success: function (data) {
-				$('#playlist').html('');
-				data.forEach(function (track, index) {
-					$('<li/>').appendTo('#playlist').attr('data-id', index).text(track.name);
-				});
-			}
-		});
-		$.ajax({
-			cache: false,
-			url: '/api/playing',
-			dataType: 'json',
-			success: function (data) {
-				if (data) {
-					$('#playing').text(data.name);
-				} else {
-					$('#playing').text('Nothing');
-				}
-			}
-		});
-	};
-	setInterval(function () {
-		refresh();
-	}, 5000);
-	refresh();
-});
-</script>
+<script src="js/main.js"></script>
 </body>
 </html>
