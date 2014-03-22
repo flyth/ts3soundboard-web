@@ -70,11 +70,11 @@ $(document).ready(function () {
 			url: '/api/savepl/' + $('#lstpl').val(),
 			success: function () {
 				refresh();
-				alert('Playlist savegardee');
+				alert('Playlist saved');
 			},
 			error: function (result) {
 				if(result.status == 500)
-					alert('Erreur lors de la sauvegarde.');
+					alert('Faild to save the playlist.');
 				else
 					alert('You are not allowed to do that, sorry.');
 			}
@@ -87,7 +87,7 @@ $(document).ready(function () {
 			url: '/api/loadpl/' + $('#lstpl').val(),
 			success: function () {
 				refresh();
-				alert('Playlist chargee');
+				alert('Playlist loaded.');
 			},
 			error: function (result) {
 				if(result.status == 500)
