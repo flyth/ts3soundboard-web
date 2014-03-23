@@ -182,8 +182,6 @@ $(document).ready(function () {
 			success: function (data) {
 				$('#playlist').html('');
 				data.forEach(function (track, index) {
-					track.name = track.name.split("/"); // Keep clam and fuck windows
-					track.name = track.name[track.name.length-1];
 					$('<li/>').appendTo('#playlist').attr('data-id', index).text(nameFromPath(track.name));
 				});
 			}
