@@ -8,7 +8,7 @@ I will update this from time to time but feel free to fork and send pull request
 
 First, make sure you've got the bot working on the same machine (or virtual machine) you want to run the webinterface on. You might want to follow these steps: http://www.kampfrausch.de/ts3/#Guides
 
-I'm assuming you're running this under 64bit Ubuntu 12.04.
+I'm assuming you're running this under 64bit Ubuntu 12.04 x64. For x86, change the x64 that appears in the following steps to x86.
 
 So after you've installed TeamSpeak 3 and the plugin, close TeamSpeak and open the file
 
@@ -40,7 +40,7 @@ Now clone the web-interface to your local machine and install some dependencies
 	cd ts3soundboard-web
 	../node/bin/npm install
 
-Now let's create a new config-file and edit it to contain the path to your music folder (basePath). Make sure both the user account you'll be running the webserver th and the user account that's running TeamSpeak will both have access to this directory.
+Now let's create a new config-file and edit it to contain the path to your music folder (basePath). Make sure both the user account you'll be running the webserver th and the user account that's running TeamSpeak will both have access to this directory. You need to enter the path of your music folder in "basePath".
 
 	cp config.dist.json config.json
 	nano config.json
