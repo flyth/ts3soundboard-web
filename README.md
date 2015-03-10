@@ -1,3 +1,5 @@
+# DEPRECATED: See http://frie.se/ts3bot for a more enhanced version.
+
 # TS3Soundboard Music Bot Webinterface
 
 This project is just a simple demo of the new remote-control feature of my TS3-Soundboard Plugin that can be used to queue music.
