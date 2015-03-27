@@ -2,6 +2,8 @@ var
 	express = require('express'),
 	dgram = require('dgram'),
 	fs = require('fs');
+	
+var util = require('util');
 
 var config, tmpConfig;
 try {
@@ -73,6 +75,108 @@ app.get('/api/playlist', function (req, res) {
 	res.setHeader('Content-Type', 'application/x-json');
 	res.end(JSON.stringify(playlist));
 });
+
+// Reload track list in case of adding files while running
+app.post('/api/reload', function (req, res) {
+	if (!req.user.permissions.reload) {
+		res.send(403, 'Not allowed.');
+		return;
+	}
+	// /stop will not emit a notification
+	console.log('Stopping');
+	skipNotification = false;
+	isPlaying = false;
+	var cmd = new Buffer("/stop");
+	cmdSocket.send(cmd, 0, cmd.length, 19111, '127.0.0.1');
+	
+	currentlyPlaying = -1;
+	playlist = [];
+	tracks = [];
+	
+	fs.readdir(BASE_PATH, function (err, files) {
+		if (err) {
+			throw new Error('Could not find files in basePath. Aborting.');
+		}
+		files.forEach(function (file) {
+			if(file.indexOf('.mp3', file.length - 4) !== -1 || file.indexOf('.ogg', file.length - 4) !== -1)
+				tracks.push({ file: BASE_PATH + '/' + file, name: file });
+		});
+	});
+	
+	res.end();
+});
+
+// Clear playlist, add all tracks, randomize it and then start playing
+app.post('/api/random', function (req, res) {
+	if (!req.user.permissions.queue || !req.user.permissions.unqueue) {
+		res.send(403, 'Not allowed.');
+		return;
+	}
+	// /stop will not emit a notification
+	console.log('Stopping');
+	skipNotification = false;
+	isPlaying = false;
+	var cmd = new Buffer("/stop");
+	cmdSocket.send(cmd, 0, cmd.length, 19111, '127.0.0.1');
+	
+	var nb = 0;
+	playlist = [];
+	tracks.forEach(function(track) {
+		playlist.push({ id: nb, name: track.name });
+		nb = nb + 1;
+	});
+	playlist.sort(function() {return 0.5 - Math.random()});
+	
+	var track = playlist.shift();
+	playById(track.id);
+	isPlaying = true;
+	currentlyPlaying = track.id;
+	
+	res.end();
+});
+
+// Randomize the current playlist
+app.post('/api/randomcurrent', function (req, res) {
+	if (!req.user.permissions.queue) {
+		res.send(403, 'Not allowed.');
+		return;
+	}
+	playlist.sort(function() {return 0.5 - Math.random()});
+	res.end();
+});
+
+// Plays next song in playlist
+app.post('/api/next', function (req, res) {
+	if (!req.user.permissions.play) {
+		res.send(403, 'Not allowed.');
+		return;
+	}
+	if (playlist.length > 0) {
+		// /stop will not emit a notification
+		console.log('Stopping');
+		skipNotification = false;
+		isPlaying = false;
+		var cmd = new Buffer("/stop");
+		cmdSocket.send(cmd, 0, cmd.length, 19111, '127.0.0.1');
+		
+		var track = playlist.shift();
+		playById(track.id);
+		isPlaying = true;
+		currentlyPlaying = track.id;
+	}
+	res.end();
+});
+
+// Clear current playlist
+app.post('/api/clear', function (req, res) {
+	if (!req.user.permissions.unqueue) {
+		res.send(403, 'Not allowed.');
+		return;
+	}
+	playlist = [];
+	res.end();
+});
+
 
 app.post('/api/stop', function (req, res) {
 	if (!req.user.permissions.stop) {
@@ -151,7 +255,8 @@ fs.readdir(BASE_PATH, function (err, files) {
 		throw new Error('Could not find files in basePath. Aborting.');
 	}
 	files.forEach(function (file) {
-		tracks.push({ file: BASE_PATH + '/' + file, name: file });
+		if(file.indexOf('.mp3', file.length - 4) !== -1 || file.indexOf('.ogg', file.length - 4) !== -1)
+			tracks.push({ file: BASE_PATH + '/' + file, name: file });
 	});
 });
 
@@ -177,3 +282,91 @@ var playById = function (id, direct) {
 		cmdSocket.send(cmd, 0, cmd.length, 19111, '127.0.0.1');
 	}
 };
+
+app.post('/api/savepl/:id', function (req, res) {
+	if (!req.user.permissions.queue) {
+		res.send(403, 'Not allowed.');
+		return;
+	}
+	
+	console.log('Saving playlist: ' + req.params.id);
+	
+	var plid = parseInt(req.params.id);
+	if(plid < 1 || plid > 10) {
+		console.log('Operation incorrecte.');
+		res.send(500, 'Not allowed.');
+		return;
+	}
+	pl = [];
+	if(currentlyPlaying > -1 && currentlyPlaying < tracks.length)
+		pl.push(tracks[currentlyPlaying].name);
+	for(i = 0; i < playlist.length; i++) {
+		pl.push(playlist[i].name);
+	}
+	try { fs.writeFileSync(BASE_PATH + '/_playlist.' + plid, JSON.stringify(pl)); }
+	catch (err) {
+		console.log('Impossible de sauvegarder la playlist.');
+		res.send(500, 'Impossible de sauvegarder la playlist.');
+		return;
+	}
+	
+	res.end();
+});
+
+app.post('/api/loadpl/:id', function (req, res) {
+	if (!req.user.permissions.queue) {
+		res.send(403, 'Not allowed.');
+		return;
+	}
+	
+	console.log('Loading playlist: ' + req.params.id);
+	
+	playlist = [];
+	
+	var plid = parseInt(req.params.id);
+	if(plid < 1 || plid > 10) {
+		console.log('Operation incorrecte.');
+		res.send(500, 'Not allowed.');
+		return;
+	}
+	
+	try { tmp = fs.readFileSync(BASE_PATH + '/_playlist.' + plid); }
+	catch (e) {
+		res.send(500, 'Playlist inconnue.');
+		return;
+	}
+	
+	try { lst = JSON.parse(tmp); }
+	catch (e) {
+		res.send(500, 'Playlist invalide.');
+		return;
+	}
+	
+	lst.forEach(function(item) {
+		for(i = 0; i < tracks.length; i++) {
+			if(item == tracks[i].name) {
+				playlist.push({
+					id: i,
+					name: tracks[i].name
+				});
+				break;
+			}
+		}
+	});
+	
+	if(playlist.length > 0) {
+		// /stop will not emit a notification
+		console.log('Stopping');
+		skipNotification = false;
+		isPlaying = false;
+		var cmd = new Buffer("/stop");
+		cmdSocket.send(cmd, 0, cmd.length, 19111, '127.0.0.1');
+		
+		var track = playlist.shift();
+		playById(track.id);
+		isPlaying = true;
+		currentlyPlaying = track.id;
+	}
+	
+	res.end();
+});
