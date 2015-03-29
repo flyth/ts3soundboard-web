@@ -8,7 +8,8 @@
 				"play": true,
 				"queue": true,
 				"unqueue": true,
-				"stop": true
+				"stop": true,
+				"reload": true
 			}
 		},
 		"guest": {

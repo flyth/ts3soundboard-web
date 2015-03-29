@@ -1,350 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-<title>TS3 Soundboard Interface</title>
-<script src="/js/jquery.min.js"></script>
-<link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Droid+Sans+Mono|Alef' rel='stylesheet' type='text/css'>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<title>TS3 Soundboard Interface</title>
+	<script src="js/jquery.min.js"></script>
+	<link href='css/fonts.css' rel='stylesheet' type='text/css'>
+	<link href='css/main.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
-<style>
-.clearfix:after {
-	content: ".";
-	display: block;
-	clear: both;
-	visibility: hidden;
-	line-height: 0;
-	height: 0;
-}
- 
-.clearfix {
-	display: inline-block;
-}
- 
-html[xmlns] .clearfix {
-	display: block;
-}
- 
-* html .clearfix {
-	height: 1%;
-}
-
-body {
-	font-family: 'Droid Sans', sans-serif;
-	background-color: #222; /* f2f2f2 */
-}
-h1 {
-	font-family: 'Alef', sans-serif;
-	margin: 0;
-	color: #333;
-	padding: 15px 15px 8px;
-}
-h2 {
-	font-family: 'Alef', sans-serif;
-	margin: 0;
-	margin-bottom: 5px;
-	margin-top: 5px;
-	padding: 0;
-	text-transform: uppercase;
-}
-h3 {
-	font-family: 'Alef', sans-serif;
-	font-size: 14px;
-	margin: 0;
-	padding: 0;
-	margin-left: 20px;
-	margin-bottom: 8px;
-}
-pre, code {
-	font-family: 'Droid Sans Mono', sans-serif;
-}
-code {
-	display: block;
-	background-color: #eee;
-	padding: 5px;
-	border: 1px solid #ccc;
-	margin-top: 5px;
-	margin-bottom: 5px;
-	white-space: pre-wrap;
-	font-size: 0.8em;
-}
-ol, ul {
-	margin: 0;
-	margin-bottom: 10px;
-}
-dl {
-	padding: 0;
-	padding-left: 20px;
-	margin: 0;
-}
-dt {
-	font-size: 13px;
-	padding: 5px;
-	padding-left: 0;
-	border-top: 1px solid #eee;
-	cursor: pointer;
-}
-dt:first-child {
-	border-top: 0;
-	padding-top: 0;
-}
-dd:last-child {
-	padding-bottom: 0;
-}
-dd {
-	display: none;
-	font-size: 12px;
-	margin: 0px;
-	padding: 5px;
-	padding-top: 0;
-	border-left: 5px solid #ccc;
-	line-height: 1.5em;
-}
-li {
-	font-size: 0.9em;
-	padding: 4px;
-}
-p {
-	font-size: 0.9em;
-	margin-top: 5px;
-	margin-left: 20px;
-	line-height: 1.4em;
-}
-.description {
-	margin-bottom: 4px;
-	font-size: 10px;
-}
-.dl {
-	margin-left: 20px;
-	font-size: 0.9em;
-	margin-bottom: 10px;
-	line-height: 1.4em;
-}
-.version {
-	font-weight: bold;
-}
-.wrapper {
-	margin: 20px auto;
-	width: 1000px;
-	background-color: #fafafa;
-	box-shadow: 0 0 16px rgba(0,0,0,0.5);
-	border-top: 8px solid #aaa;
-}
-.left {
-	float: left;
-	width: 650px;
-	padding-left: 15px;
-}
-.right {
-	float: right;
-	width: 300px;
-	padding-right: 15px;
-}
-a {
-	color: #068fd5;
-}
-input[type="submit"], input[type="button"], .button {
-	margin: 0;
-	border: 0;
-	border-radius: 4px 4px 5px 5px;
-	position: relative;
-	text-align: center;
-	background-color: #c6cacd;
-	box-shadow: 0 4px 0 #b0b5ba;
-	color: #fff;
-	text-decoration: none;
-	-webkit-transition: all .2s ease;
-	-moz-transition: all .2s ease;
-	transition: all .2s ease;
-	cursor: pointer;
-	display: inline-block;
-	height: 38px;
-	line-height: 40px;
-	font-size: 13px;
-	padding-left: 10px;
-	padding-right: 10px;
-}
-input[type="submit"]:hover, input[type="button"]:hover, .button:hover {
-	background-color: #b0b5ba;
-}
-form {
-	margin: 0;
-	padding: 0;
-}
-.changelog li {
-	padding: 0;
-	padding-top: 3px;
-	font-size: 12px;
-}
-.footer {
-	margin-top: 10px;
-	background-color: #666;
-	color: #ccc;
-	padding: 15px;
-	font-size: 12px;
-}
-
-
-.warn {
-	margin-top: 10px;
-	margin-bottom: 10px;
-	border: 1px solid #880000;
-	color: #aa0000;
-	line-height: 1.3em;
-	padding: 10px;
-	font-size: 13px;
-}
-
-.tracks {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-.tracks li {
-	list-style: none;
-	margin: 0;
-	padding: 5px;
-	cursor: pointer;
-	background-color: #f6f6f6;
-	overflow: hidden;
-}
-.tracks li:nth-child(odd) {
-	background-color: #f3f3f3;
-}
-.tracks li:hover {
-	background-color: #eee;
-}
-</style>
 <div class="wrapper">
 	<h1>TS3Soundboard</h1>
+		<div class="commands">
+			<a href="#" class="button" id="logout" style="float: right; margin-right: 15px; background-color: #aa4444;">LOGOUT</a>
+			<a href="#" class="button" id="stop" style="float: right; margin-right: 15px; background-color: #aa4444;">STOP</a>
+			<a href="#" class="button" id="random" style="float: right; margin-right: 15px; background-color: #aa4444;">RANDOM ALL</a>
+			<a href="#" class="button" id="randomcurrent" style="float: right; margin-right: 15px; background-color: #aa4444;">RANDOM CURRENT</a>
+			<a href="#" class="button" id="clear" style="float: right; margin-right: 15px; background-color: #aa4444;">CLEAR LIST</a>
+			<a href="#" class="button" id="next" style="float: right; margin-right: 15px; background-color: #aa4444;">NEXT SONG</a>
+			<a href="#" class="button" id="reload" style="float: right; margin-right: 15px; background-color: #aa4444;">RELOAD</a>
+			<br><br>
+			<a href="#" class="button" id="loadpl" style="float: right; margin-right: 15px; background-color: #aa4444;">LOAD</a>
+			<a href="#" class="button" id="savepl" style="float: right; margin-right: 15px; background-color: #aa4444;">SAVE</a>
+			<select style="float: right; margin-right: 15px; background-color: #aa4444; color: #ffffff;" id="lstpl">
+				<option value="1" selected="selected">Playlist 1</option>
+				<option value="2">Playlist 2</option>
+				<option value="3">Playlist 3</option>
+				<option value="4">Playlist 4</option>
+				<option value="5">Playlist 5</option>
+				<option value="6">Playlist 6</option>
+				<option value="7">Playlist 7</option>
+				<option value="8">Playlist 8</option>
+				<option value="9">Playlist 9</option>
+				<option value="10">Playlist 10</option>
+			</select>
+		</div>
 	<div style="margin-left: 15px; font-size: 11px;">Currently Playing</div>
-	<a href="#" class="button" id="logout" style="float: right; margin-right: 15px; background-color: #aa4444;">LOGOUT</a>
-	<a href="#" class="button" id="stop" style="float: right; margin-right: 15px; background-color: #aa4444;">STOP</a>
 	<h2 style="margin-left: 15px; margin-top: 0;" id="playing"></h2>
 	<div class="clearfix" style="width: 100%;">
-		<div class="left">
-			<h2>Tracks</h2>
+		<div class="trackscont">
+			<h2 id="trackshead">Tracks</h2>
 			<div>
-				<ul id="tracks" class="tracks"></ul>
+				<ul id="tracks" class="tracks">
+				</ul>
 			</div>
 		</div>
-		<div class="right">
+		<div class="playlistcont">
 			<h2>Playlist</h2>
 			<div>
-				<ul id="playlist" class="tracks"></ul>
+				<ul id="playlist" class="tracks">
+				</ul>
 			</div>
 		</div>
 	</div>
 	<div class="footer">&copy; 2011-2013 Michael Friese. All rights reserved.</div>
 </div>
-<script>
-$(document).ready(function () {
-	$(document).on('click', '#logout', function () {
-		$.ajax({
-			type: 'POST',
-			username: 'logout',
-			url: '/',
-			success: function () {
-				window.location.href = '/';
-			},
-			error: function () {
-				window.location.href = '/';	
-			}
-		});
-		return false;		
-	});
-	$(document).on('click', '#stop', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/stop',
-			success: function () {
-				refresh();
-			},
-			error: function () {
-				alert('You are not allowed to do that, sorry.');
-			}
-		});
-		return false;		
-	});
-	$(document).on('click', '#tracks li', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/play/' + $(this).attr('data-id'),
-			success: function () {
-				refresh();
-			},
-			error: function () {
-				alert('You are not allowed to do that, sorry.');
-			}
-		});
-		return false;
-	});
-	/*
-	$(document).on('dblclick', '#tracks li', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/playDirect/' + $(this).attr('data-id'),
-			success: function () {
-				refresh();
-			}
-		});
-		return false;
-	});
-	*/
-	$(document).on('click', '#playlist li', function () {
-		$.ajax({
-			type: 'POST',
-			url: '/api/unqueue/' + $(this).attr('data-id'),
-			success: function () {
-				refresh();
-			},
-			error: function () {
-				alert('You are not allowed to do that, sorry.');
-			}
-		});
-		return false;
-	});
-	$.ajax({
-		cache: false,
-		url: '/api/tracks',
-		dataType: 'json',
-		success: function (data) {
-			data.forEach(function (track) {
-				$('<li/>').appendTo('#tracks').attr('data-id', track.id).text(track.name);
-			});
-		}
-	});
-	var refresh = function () {
-		$.ajax({
-			cache: false,
-			url: '/api/playlist',
-			dataType: 'json',
-			success: function (data) {
-				$('#playlist').html('');
-				data.forEach(function (track, index) {
-					$('<li/>').appendTo('#playlist').attr('data-id', index).text(track.name);
-				});
-			}
-		});
-		$.ajax({
-			cache: false,
-			url: '/api/playing',
-			dataType: 'json',
-			success: function (data) {
-				if (data) {
-					$('#playing').text(data.name);
-				} else {
-					$('#playing').text('Nothing');
-				}
-			}
-		});
-	};
-	setInterval(function () {
-		refresh();
-	}, 5000);
-	refresh();
-});
-</script>
+<script src="js/main.js"></script>
 </body>
 </html>
